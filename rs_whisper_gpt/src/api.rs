@@ -3,7 +3,7 @@ use objc::rc::autoreleasepool;
 use objc::runtime::Object;
 use objc::{class, msg_send, sel, sel_impl};
 use std::path::{Path, PathBuf};
-use whisper_rs::{FullParams, SamplingStrategy, WhisperContext};
+use whisper_rs::{FullParams, SamplingStrategy, WhisperContext, WhisperContextParameters};
 
 fn get_resources_dir() -> PathBuf {
     let bundle: *mut Object = unsafe { msg_send![class!(NSBundle), mainBundle] };
@@ -42,8 +42,7 @@ fn parse_wav_file(path: &Path) -> Vec<i16> {
 
 fn run_whisper_audio_to_text(ctx: WhisperContext, samples: Vec<f32>, lang: Option<String>) -> Vec<String> {
     let mut strings: Vec<String> = vec![];
-    let mut state: whisper_rs::WhisperState<'_> =
-        ctx.create_state().expect("failed to create state");
+    let mut state = ctx.create_state().expect("failed to create state");
 
     let mut params = FullParams::new(SamplingStrategy::default());
 
@@ -96,9 +95,13 @@ pub fn run_whisper_model(path: String, lang: Option<String>) -> Vec<String> {
         }
         // Parse Wave File
         let original_samples = parse_wav_file(audio_path);
-        let samples = whisper_rs::convert_integer_to_float_audio(&original_samples);
-        let ctx =
-            WhisperContext::new(&whisper_path.to_string_lossy()).expect("failed to open model");
+        let mut samples = vec![0.0f32; original_samples.len()];
+        whisper_rs::convert_integer_to_float_audio(&original_samples, &mut samples)
+            .expect("failed to convert samples to float");
+        let ctx = WhisperContext::new_with_params(
+            &whisper_path.to_string_lossy(),
+            WhisperContextParameters::default()
+        ).expect("failed to open model");
 
         // Run Whisper Model on Samples and Return Vec<String> of Text
         run_whisper_audio_to_text(ctx, samples, lang)
