@@ -115,6 +115,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
+        appBar: AppBar(title: const Text('BluLeap Model'),),
         body: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
