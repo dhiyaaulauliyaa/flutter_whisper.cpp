@@ -19,9 +19,3 @@ crossbeam = "0.8"
 hound = "3"
 whisper-rs = "0.12.0"
 objc = "0.2.7"
-
-[target.'cfg(target_os = "ios")']
-rustflags = ["-l", "c++", "-l", "c++abi"]
-
-[target.'cfg(target_os = "macosx")']
-rustflags = ["-l", "c++", "-l", "c++abi"]
