@@ -1,0 +1,35 @@
+{
+  "recommendations": [
+    // Core Flutter & Dart
+    "dart-code.flutter",
+    "dart-code.dart-code",
+
+    // Enhanced Flutter Development
+    "felixangelov.bloc",
+    "luanpotter.dart-import",
+    "jeroen-meijer.pubspec-assist",
+    "flutterando.flutter-coverage",
+
+    // Code Quality & Formatting
+    "usernamehw.errorlens",
+    "esbenp.prettier-vscode",
+    "aaron-bond.better-comments",
+
+    // Visual Enhancements
+    "naumovs.color-highlight",
+    "anseki.vscode-color",
+
+    // Git & Version Control
+    "eamodio.gitlens",
+    "donjayamanne.githistory",
+    "mhutchie.git-graph",
+
+    // General Productivity
+    "ms-vscode.vscode-json",
+    "redhat.vscode-yaml",
+    "formulahendry.auto-rename-tag",
+    "christian-kohler.path-intellisense",
+    "ms-vscode-remote.remote-containers",
+    "eliostruyf.vscode-hide-comments"
+  ]
+}

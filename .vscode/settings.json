@@ -1,0 +1,7 @@
+{
+  "editor.tokenColorCustomizations": {
+    "comments": "#a5a5a5",
+    "textMateRules": []
+  },
+  "dart.flutterSdkPath": ".fvm/versions/3.32.8"
+}
