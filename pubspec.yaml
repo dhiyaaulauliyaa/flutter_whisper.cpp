@@ -16,7 +16,7 @@ dependencies:
   cupertino_icons: ^1.0.5
   freezed_annotation: ^2.1.0
   ffmpeg_kit_flutter_new: ^3.1.0
-  ffi: ^2.1.2
+  ffi: ^2.1.0
 
 dev_dependencies:
   flutter_test:
@@ -26,7 +26,7 @@ dev_dependencies:
   flutter_lints: ^1.0.0
   freezed: ^2.2.0
   build_runner: ^2.2.0
-  ffigen: ^9.0.0
+  ffigen: ^15.0.0
 
 
 flutter:
