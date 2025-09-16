@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:record/record.dart';
 import 'package:whisper_gpt/audio_player.dart';
 import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit.dart';
+import 'package:whisper_gpt/performance_overlay.dart' as perf;
 
 import 'package:whisper_gpt/bridge_generated.dart';
 import 'dart:ffi';
@@ -244,11 +245,18 @@ class _MyAppState extends State<MyApp> {
   bool showPlayer = false;
   bool showText = false;
   String? audioPath;
+  bool _showPerformanceOverlay = false;
 
   @override
   void initState() {
     showPlayer = false;
     super.initState();
+  }
+
+  void _togglePerformanceOverlay() {
+    setState(() {
+      _showPerformanceOverlay = !_showPerformanceOverlay;
+    });
   }
 
   @override
@@ -258,25 +266,48 @@ class _MyAppState extends State<MyApp> {
           appBar: AppBar(
             // title: const Text('GGML Base Model'),
             title: const Text('BluLeap Model'),
+            actions: [
+              IconButton(
+                icon: Icon(
+                  _showPerformanceOverlay ? Icons.analytics : Icons.analytics_outlined,
+                  color: _showPerformanceOverlay ? Colors.green : null,
+                ),
+                onPressed: _togglePerformanceOverlay,
+                tooltip: 'Toggle Performance Monitor',
+              ),
+            ],
           ),
-          body: Center(
-            child: showPlayer
-                ? AudioPlayer(
-                    api: api,
-                    source: audioPath!,
-                    onDelete: () {
-                      setState(() => showPlayer = false);
-                    },
-                  )
-                : AudioRecorder(
-                    onStop: (path) {
-                      if (kDebugMode) print('Recorded file path: $path');
-                      setState(() {
-                        audioPath = path;
-                        showPlayer = true;
-                      });
-                    },
-                  ),
+          body: Stack(
+            children: [
+              Center(
+                child: showPlayer
+                    ? AudioPlayer(
+                        api: api,
+                        source: audioPath!,
+                        onDelete: () {
+                          setState(() => showPlayer = false);
+                        },
+                      )
+                    : AudioRecorder(
+                        onStop: (path) {
+                          if (kDebugMode) print('Recorded file path: $path');
+                          setState(() {
+                            audioPath = path;
+                            showPlayer = true;
+                          });
+                        },
+                      ),
+              ),
+              // Performance Overlay
+              perf.PerformanceOverlay(
+                isVisible: _showPerformanceOverlay,
+                onToggleVisibility: () {
+                  setState(() {
+                    _showPerformanceOverlay = false;
+                  });
+                },
+              ),
+            ],
           )),
     );
   }
