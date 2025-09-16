@@ -113,24 +113,21 @@ class _AudioRecorderState extends State<AudioRecorder> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(title: const Text('BluLeap Model'),),
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                _buildRecordStopControl(),
-                const SizedBox(width: 20),
-                _buildPauseResumeControl(),
-                const SizedBox(width: 20),
-                _buildText(),
-              ],
-            ),
-          ],
-        ),
+    return Scaffold(
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              _buildRecordStopControl(),
+              const SizedBox(width: 20),
+              _buildPauseResumeControl(),
+              const SizedBox(width: 20),
+              _buildText(),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -258,25 +255,29 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
+          appBar: AppBar(
+            // title: const Text('GGML Base Model'),
+            title: const Text('BluLeap Model'),
+          ),
           body: Center(
-        child: showPlayer
-            ? AudioPlayer(
-                api: api,
-                source: audioPath!,
-                onDelete: () {
-                  setState(() => showPlayer = false);
-                },
-              )
-            : AudioRecorder(
-                onStop: (path) {
-                  if (kDebugMode) print('Recorded file path: $path');
-                  setState(() {
-                    audioPath = path;
-                    showPlayer = true;
-                  });
-                },
-              ),
-      )),
+            child: showPlayer
+                ? AudioPlayer(
+                    api: api,
+                    source: audioPath!,
+                    onDelete: () {
+                      setState(() => showPlayer = false);
+                    },
+                  )
+                : AudioRecorder(
+                    onStop: (path) {
+                      if (kDebugMode) print('Recorded file path: $path');
+                      setState(() {
+                        audioPath = path;
+                        showPlayer = true;
+                      });
+                    },
+                  ),
+          )),
     );
   }
 }

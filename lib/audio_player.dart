@@ -71,30 +71,28 @@ class AudioPlayerState extends State<AudioPlayer> {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
-      builder: (context, constraints) {
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Row(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                _buildControl(),
-                _buildSlider(constraints.maxWidth * 0.7),
-                IconButton(
-                  icon: const Icon(Icons.delete,
-                      color: Color(0xFF73748D), size: _deleteBtnSize),
-                  onPressed: () {
-                    stop().then((value) => widget.onDelete());
-                  },
-                ),
-              ],
-            ),
-            _buildTranscribeButton(),
-            _buildTranscribedText(),
-          ],
-        );
-      },
+      builder: (context, constraints) => Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              _buildControl(),
+              _buildSlider(constraints.maxWidth * 0.7),
+              IconButton(
+                icon: const Icon(Icons.delete,
+                    color: Color(0xFF73748D), size: _deleteBtnSize),
+                onPressed: () {
+                  stop().then((value) => widget.onDelete());
+                },
+              ),
+            ],
+          ),
+          _buildTranscribeButton(),
+          Expanded(child: _buildTranscribedText()),
+        ],
+      ),
     );
   }
 
@@ -184,14 +182,15 @@ class AudioPlayerState extends State<AudioPlayer> {
 
   Widget _buildTranscribedText() {
     if (transcribedText != null) {
-      return FractionallySizedBox(
-          widthFactor: 1 / 2,
-          alignment: Alignment.center,
-          child: Padding(
-              padding: const EdgeInsets.only(top: 30),
-              child: Text(
-                transcribedText!.join(" "),
-              )));
+      return Padding(
+        padding: const EdgeInsets.only(top: 10.0),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Text(
+            transcribedText!.join(" "),
+          ),
+        ),
+      );
     }
     return Container();
   }
