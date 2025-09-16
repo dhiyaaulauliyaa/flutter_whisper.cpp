@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:system_info2/system_info2.dart';
 
 class PerformanceData {
@@ -29,6 +30,9 @@ class PerformanceMonitor {
   Timer? _timer;
   final StreamController<PerformanceData> _controller = StreamController<PerformanceData>.broadcast();
   
+  // Method channel for native performance monitoring
+  static const MethodChannel _methodChannel = MethodChannel('performance_monitor');
+  
   // FPS tracking variables
   int _frameCount = 0;
   int _lastFrameCount = 0;
@@ -36,6 +40,7 @@ class PerformanceMonitor {
   
   // Memory tracking
   double _totalMemoryMB = 0;
+  bool _useNativeMonitoring = false;
   
   Stream<PerformanceData> get performanceStream => _controller.stream;
   
@@ -47,27 +52,40 @@ class PerformanceMonitor {
     
     _isMonitoring = true;
     
-    // Get total memory once
-    try {
-      final totalMemoryBytes = SysInfo.getTotalPhysicalMemory();
-      _totalMemoryMB = totalMemoryBytes / (1024 * 1024);
-    } catch (e) {
-      _totalMemoryMB = 8192; // Fallback to 8GB
-      if (kDebugMode) print('Error getting total memory: $e');
-    }
+    // Check if native monitoring is available
+    await _initializeNativeMonitoring();
     
+    // Get total memory once
+    if (_useNativeMonitoring) {
+      try {
+        final result = await _methodChannel.invokeMethod('getTotalMemory');
+        _totalMemoryMB = (result as num).toDouble() / (1024 * 1024);
+      } catch (e) {
+        _totalMemoryMB = 8192; // Fallback to 8GB
+        if (kDebugMode) print('Error getting total memory from native: $e');
+      }
+    } else {
+      try {
+        final totalMemoryBytes = SysInfo.getTotalPhysicalMemory();
+        _totalMemoryMB = totalMemoryBytes / (1024 * 1024);
+      } catch (e) {
+        _totalMemoryMB = 8192; // Fallback to 8GB
+        if (kDebugMode) print('Error getting total memory: $e');
+      }
+    }
+
     // Start periodic monitoring
     _timer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
       _updatePerformanceData();
     });
-    
+
     // Start FPS monitoring
     _startFpsMonitoring();
   }
 
   void stopMonitoring() {
     if (!_isMonitoring) return;
-    
+
     _isMonitoring = false;
     _timer?.cancel();
     _timer = null;
@@ -81,7 +99,7 @@ class PerformanceMonitor {
         timer.cancel();
         return;
       }
-      
+
       final now = DateTime.now();
       final timeDiff = now.difference(_lastFpsUpdate).inMilliseconds;
       if (timeDiff >= 1000) {
@@ -92,45 +110,72 @@ class PerformanceMonitor {
     });
   }
 
+  // Initialize native monitoring capability check
+  Future<void> _initializeNativeMonitoring() async {
+    try {
+      // Test if native performance monitoring is available
+      await _methodChannel.invokeMethod('getSystemInfo');
+      _useNativeMonitoring = true;
+      if (kDebugMode) print('Native performance monitoring available');
+    } catch (e) {
+      _useNativeMonitoring = false;
+      if (kDebugMode) print('Native performance monitoring not available: $e');
+    }
+  }
+
   void _updatePerformanceData() async {
     try {
-      // Get CPU usage
       double cpuUsage = 0.0;
-      try {
-        // Simple CPU usage approximation - in production you might want to use platform-specific code
-        cpuUsage = _getCpuUsage();
-      } catch (e) {
-        cpuUsage = 0.0;
-      }
-
-      // Get memory usage
       double memoryUsageMB = 0.0;
       double memoryUsagePercent = 0.0;
-      
-      try {
-        if (Platform.isAndroid || Platform.isIOS) {
-          // For mobile platforms, use system info
-          final freeMemory = SysInfo.getFreePhysicalMemory();
-          final usedMemory = _totalMemoryMB * 1024 * 1024 - freeMemory;
-          memoryUsageMB = usedMemory / (1024 * 1024);
+
+      if (_useNativeMonitoring) {
+        // Use native monitoring for more accurate data
+        try {
+          final systemInfo = await _methodChannel.invokeMethod('getSystemInfo') as Map<Object?, Object?>;
+          cpuUsage = (systemInfo['cpuUsagePercent'] as num).toDouble();
+          memoryUsageMB = (systemInfo['usedMemoryMB'] as num).toDouble();
+          memoryUsagePercent = (systemInfo['memoryUsagePercent'] as num).toDouble();
+          
+          if (kDebugMode) {
+            print('Native data - CPU: $cpuUsage%, Memory: ${memoryUsageMB}MB (${memoryUsagePercent}%)');
+          }
+        } catch (e) {
+          if (kDebugMode) print('Error getting native performance data: $e');
+          // Fall back to approximation
+          cpuUsage = _getCpuUsage();
+          memoryUsageMB = 150.0; // Fallback estimate
           memoryUsagePercent = (memoryUsageMB / _totalMemoryMB) * 100;
-        } else {
-          // For desktop platforms
-          final processInfo = await Process.run('ps', ['-o', 'pid,rss', '-p', '$pid']);
-          final lines = processInfo.stdout.toString().split('\n');
-          if (lines.length > 1) {
-            final parts = lines[1].trim().split(RegExp(r'\s+'));
-            if (parts.length >= 2) {
-              final rssKB = double.tryParse(parts[1]) ?? 0.0;
-              memoryUsageMB = rssKB / 1024;
-              memoryUsagePercent = (memoryUsageMB / _totalMemoryMB) * 100;
+        }
+      } else {
+        // Fall back to system_info2 or approximations
+        cpuUsage = _getCpuUsage();
+        
+        try {
+          if (Platform.isAndroid || Platform.isIOS) {
+            // For mobile platforms, use system info
+            final freeMemory = SysInfo.getFreePhysicalMemory();
+            final usedMemory = _totalMemoryMB * 1024 * 1024 - freeMemory;
+            memoryUsageMB = usedMemory / (1024 * 1024);
+            memoryUsagePercent = (memoryUsageMB / _totalMemoryMB) * 100;
+          } else {
+            // For desktop platforms
+            final processInfo = await Process.run('ps', ['-o', 'pid,rss', '-p', '$pid']);
+            final lines = processInfo.stdout.toString().split('\n');
+            if (lines.length > 1) {
+              final parts = lines[1].trim().split(RegExp(r'\s+'));
+              if (parts.length >= 2) {
+                final rssKB = double.tryParse(parts[1]) ?? 0.0;
+                memoryUsageMB = rssKB / 1024;
+                memoryUsagePercent = (memoryUsageMB / _totalMemoryMB) * 100;
+              }
             }
           }
+        } catch (e) {
+          if (kDebugMode) print('Error getting memory usage: $e');
+          memoryUsageMB = 150.0; // Fallback estimate
+          memoryUsagePercent = (memoryUsageMB / _totalMemoryMB) * 100;
         }
-      } catch (e) {
-        if (kDebugMode) print('Error getting memory usage: $e');
-        memoryUsageMB = 0.0;
-        memoryUsagePercent = 0.0;
       }
 
       // Estimate FPS (simplified)

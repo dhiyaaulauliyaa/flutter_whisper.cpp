@@ -7,8 +7,6 @@ PODS:
   - ffmpeg_kit_flutter_new/full-gpl (1.0.0):
     - Flutter
   - Flutter (1.0.0)
-  - integration_test (0.0.1):
-    - Flutter
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
@@ -19,7 +17,6 @@ DEPENDENCIES:
   - audioplayers_darwin (from `.symlinks/plugins/audioplayers_darwin/ios`)
   - ffmpeg_kit_flutter_new (from `.symlinks/plugins/ffmpeg_kit_flutter_new/ios`)
   - Flutter (from `Flutter`)
-  - integration_test (from `.symlinks/plugins/integration_test/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - record (from `.symlinks/plugins/record/ios`)
 
@@ -30,8 +27,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/ffmpeg_kit_flutter_new/ios"
   Flutter:
     :path: Flutter
-  integration_test:
-    :path: ".symlinks/plugins/integration_test/ios"
   path_provider_foundation:
     :path: ".symlinks/plugins/path_provider_foundation/darwin"
   record:
@@ -41,7 +36,6 @@ SPEC CHECKSUMS:
   audioplayers_darwin: ccf9c770ee768abb07e26d90af093f7bab1c12ab
   ffmpeg_kit_flutter_new: 12426a19f10ac81186c67c6ebc4717f8f4364b7f
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
-  integration_test: 2d03ab552da9a1f408709a6acf3d7ca4cb3cb307
   path_provider_foundation: 608fcb11be570ce83519b076ab6a1fffe2474f05
   record: 426d0643542aaca81f738c5d214ad99626b2f134
 
