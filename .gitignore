@@ -45,8 +45,31 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 output.wav
-ggml-base.en.bin
-ggml-tiny.en.bin
+
+# ML Model files (large binaries - download separately)
+*.bin
+*.ggml
+*.model
+*.onnx
+*.pt
+*.pth
+*.safetensors
+
+# Rust build artifacts
+rs_whisper_gpt/target/
+rs_whisper_gpt/build/
+
+# Additional audio/media files
+*.wav
+*.mp3
+*.m4a
+*.flac
+*.aac
 
 # FVM Version Cache
 .fvm/
+
+# Xcode user data (IDE preferences, not functional code)
+**/xcuserdata/
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
