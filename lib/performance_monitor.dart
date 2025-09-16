@@ -40,7 +40,7 @@ class PerformanceMonitor {
   
   // Memory tracking
   double _totalMemoryMB = 0;
-  bool _useNativeMonitoring = false;
+  bool _useNativeMonitoring = true;
   
   Stream<PerformanceData> get performanceStream => _controller.stream;
   

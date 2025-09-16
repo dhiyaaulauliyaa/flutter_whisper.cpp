@@ -21,7 +21,10 @@ final dylib = Platform.isIOS
 
 final api = RsWhisperGptImpl(dylib);
 
-void main() => runApp(const MyApp());
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(const MyApp());
+}
 
 class AudioRecorder extends StatefulWidget {
   final void Function(String path) onStop;
@@ -269,7 +272,9 @@ class _MyAppState extends State<MyApp> {
             actions: [
               IconButton(
                 icon: Icon(
-                  _showPerformanceOverlay ? Icons.analytics : Icons.analytics_outlined,
+                  _showPerformanceOverlay
+                      ? Icons.analytics
+                      : Icons.analytics_outlined,
                   color: _showPerformanceOverlay ? Colors.green : null,
                 ),
                 onPressed: _togglePerformanceOverlay,

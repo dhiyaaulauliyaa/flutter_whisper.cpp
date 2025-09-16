@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'performance_monitor.dart';
+import 'native_performance_monitor.dart';
 
 class PerformanceOverlay extends StatefulWidget {
   final bool isVisible;
@@ -17,7 +17,7 @@ class PerformanceOverlay extends StatefulWidget {
 }
 
 class _PerformanceOverlayState extends State<PerformanceOverlay> {
-  final PerformanceMonitor _monitor = PerformanceMonitor();
+  final NativePerformanceMonitor _monitor = NativePerformanceMonitor();
   StreamSubscription<PerformanceData>? _subscription;
   PerformanceData? _currentData;
   
@@ -122,7 +122,7 @@ class _PerformanceOverlayState extends State<PerformanceOverlay> {
   Widget _buildCompactView() {
     return Container(
       padding: const EdgeInsets.all(8.0),
-      child: Column(
+      child: const Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
@@ -130,7 +130,7 @@ class _PerformanceOverlayState extends State<PerformanceOverlay> {
             color: Colors.green,
             size: 24,
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: 4),
           Text(
             'PERF',
             style: TextStyle(
@@ -170,7 +170,7 @@ class _PerformanceOverlayState extends State<PerformanceOverlay> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
+              const Text(
                 'Performance Monitor',
                 style: TextStyle(
                   color: Colors.white,
@@ -180,7 +180,7 @@ class _PerformanceOverlayState extends State<PerformanceOverlay> {
               ),
               GestureDetector(
                 onTap: widget.onToggleVisibility,
-                child: Icon(
+                child: const Icon(
                   Icons.close,
                   color: Colors.white,
                   size: 16,
@@ -226,7 +226,7 @@ class _PerformanceOverlayState extends State<PerformanceOverlay> {
       children: [
         Text(
           label,
-          style: TextStyle(
+          style: const TextStyle(
             color: Colors.white70,
             fontSize: 10,
             fontWeight: FontWeight.w500,

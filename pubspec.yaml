@@ -17,8 +17,6 @@ dependencies:
   freezed_annotation: ^2.1.0
   ffmpeg_kit_flutter_new: ^3.1.0
   ffi: ^2.1.0
-  system_info2: ^4.0.0
-  dartx: ^1.2.0
 
 dev_dependencies:
   flutter_test:
